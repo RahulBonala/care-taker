@@ -9,6 +9,8 @@ import { useT } from "@/i18n/useT";
 import { cn } from "@/lib/cn";
 import { setUi, useDemo } from "@/store/store";
 
+const NO_EVENTS: ActivityEvent[] = [];
+
 const TONE = {
   info: { icon: Info, cls: "text-info" },
   ok: { icon: CircleCheck, cls: "text-ok" },
@@ -18,7 +20,7 @@ const TONE = {
 
 export function ActivityFeed({ className }: { className?: string }) {
   const { t } = useT();
-  const events = useDemo((s) => s.data?.events ?? []);
+  const events = useDemo((s) => s.data?.events) ?? NO_EVENTS;
   const scope = useDemo((s) => s.ui.feedScope);
   const focus = useDemo((s) => s.ui.focusPatientId);
   const list = useMemo(() => {

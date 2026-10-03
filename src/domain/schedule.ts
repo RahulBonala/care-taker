@@ -16,9 +16,15 @@ export function currentPrescription(p: Patient): PrescriptionVersion | undefined
   return p.prescriptions[p.prescriptions.length - 1];
 }
 
+/** The latest version a nurse has verified (an edit in progress does not hide it). */
 export function verifiedPrescription(p: Patient): PrescriptionVersion | undefined {
-  const cur = currentPrescription(p);
-  return cur?.status === "verified" ? cur : undefined;
+  for (let i = p.prescriptions.length - 1; i >= 0; i--) if (p.prescriptions[i].status === "verified") return p.prescriptions[i];
+  return undefined;
+}
+
+/** The newest version is still waiting for a nurse to verify it: no calls go out. */
+export function awaitingVerification(p: Patient): boolean {
+  return currentPrescription(p)?.status !== "verified";
 }
 
 /** Call time for a slot: the override if set, else 30 minutes after the meal (bedtime: at bedtime). */
@@ -44,7 +50,7 @@ export type NoCallsReason = "notVerified" | "noConsent" | "packageEnded" | "notS
 /** Why no calls are going out for this patient right now (null when calls are on). */
 export function noCallsReason(p: Patient, now: number): NoCallsReason {
   if (!p.consent.calls || p.consent.withdrawnAt) return "noConsent";
-  if (!verifiedPrescription(p)) return "notVerified";
+  if (awaitingVerification(p)) return "notVerified";
   if (p.pkg.status !== "active") return "packageEnded";
   if (localDate(now) < p.pkg.startDate) return "notStarted";
   return null;

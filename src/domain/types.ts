@@ -303,7 +303,7 @@ export interface LogBase {
   id: string;
   patientId: string;
   at: number;
-  source: "call" | "caregiver" | "nurse" | "system" | "doctor";
+  source: "call" | "app" | "caregiver" | "nurse" | "system" | "doctor";
   by?: string;
   /** Earlier entry this one replaces. The old entry stays in the log. */
   replaces?: string;

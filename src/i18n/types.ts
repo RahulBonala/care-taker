@@ -9,8 +9,12 @@ type Leaves<T, P extends string = ""> = {
   [K in keyof T & string]: T[K] extends string | readonly string[] ? `${P}${K}` : Leaves<T[K], `${P}${K}.`>;
 }[keyof T & string];
 
+type LeafKey = Leaves<Messages>;
+/** Plural keys are written "x_one" / "x_other" and used as "x" with a count. */
+type PluralBase<K> = K extends `${infer B}_one` ? B : never;
+
 /** Every translation key, e.g. "family.home.title". */
-export type MessageKey = Leaves<Messages>;
+export type MessageKey = LeafKey | PluralBase<LeafKey>;
 
 export interface LanguagePack {
   code: string;

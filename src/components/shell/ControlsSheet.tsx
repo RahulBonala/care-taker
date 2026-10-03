@@ -27,14 +27,14 @@ export function ControlsSheet({ role }: { role: Role | null }) {
         onClick={() => useDemo.setState({ controlsOpen: true })}
         aria-label={t("shell.demoControls")}
         className={cn(
-          "fixed right-3 z-30 inline-flex h-14 items-center gap-2 rounded-full px-4 font-bold shadow-xl sm:hidden",
+          "fixed right-3 z-30 inline-flex h-12 items-center gap-2 rounded-full px-4 font-bold shadow-xl sm:hidden",
           ringing ? "bg-ok text-white dark:text-[#06200f]" : "bg-brand text-brand-ink",
           role ? "bottom-[calc(env(safe-area-inset-bottom)+80px)]" : "bottom-[calc(env(safe-area-inset-bottom)+16px)]",
           storyActive && "ring-4 ring-warn",
         )}
       >
         {ringing ? <Phone aria-hidden size={22} className="ring-shake" /> : <SlidersHorizontal aria-hidden size={22} />}
-        <span>{t("shell.demoControls")}</span>
+        <span>{t("shell.demo")}</span>
       </button>
       {open &&
         createPortal(

@@ -71,7 +71,7 @@ export function closeDay(data: DemoData, date: LocalDate, at: number, verbose: (
     const views = book.day(p, date, at);
     for (const slot of slotsToMarkMissed(views)) {
       data.log.push({ id: nextId(data, "l"), kind: "doseMissed", patientId: p.id, at, source: "system", date, slot, confirmation: "systemEndOfDay" });
-      if (verbose(p.id)) emit(data, at, "event.markedMissed", { patient: { $person: p.id }, slot: { $t: `slot.${slot}` } }, ["family", "nurse", "doctor", "admin"], "danger", p.id);
+      if (verbose(p.id)) emit(data, at, "event.markedMissed", { patient: { $person: p.id }, slot: { $t: `slotWord.${slot}` } }, ["family", "nurse", "doctor", "admin"], "danger", p.id);
     }
     const dropped = data.queue.filter((q) => q.patientId === p.id && q.date === date);
     if (dropped.length) data.queue = data.queue.filter((q) => !(q.patientId === p.id && q.date === date));

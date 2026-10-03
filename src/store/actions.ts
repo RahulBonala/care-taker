@@ -6,12 +6,13 @@
  * the result back, so every role sees the change at once.
  */
 import type { DemoData } from "@/domain/data";
-import { findPatient } from "@/domain/data";
+import { findPatient, nextId } from "@/domain/data";
 import { callTimeFor, noCallsReason, plannedSlots } from "@/domain/schedule";
-import type { CallInput, Patient } from "@/domain/types";
+import type { CallInput, Patient, Slot } from "@/domain/types";
 import { addDays, atLocal, endOfLocalDay, HOUR, localDate, MIN } from "@/lib/time";
 import { advanceClock } from "@/sim/advance";
 import { applyInput } from "@/sim/calls";
+import { emit } from "@/sim/emit";
 import { buildSeed, STORY_START } from "@/sim/seed";
 import { DEFAULT_UI, setUi, useDemo, type UiState } from "./store";
 
@@ -193,4 +194,14 @@ export function setActingAs(role: keyof UiState["actingAs"], id: string) {
     const f = data.family.find((x) => x.id === id);
     if (f) setUi((ui) => ({ focusPatientId: f.patientId, actingAs: { ...ui.actingAs, patient: f.patientId } }));
   }
+}
+
+/** Smartphone app: the patient confirms a dose after a read-back style check. */
+export function confirmTakenInApp(patientId: string, date: string, slot: Slot) {
+  mutate((data, now) => {
+    data.log.push({ id: nextId(data, "l"), kind: "doseTaken", patientId, at: now, source: "app", date, slot, takenAt: now, confirmation: "appTap" });
+    data.queue = data.queue.filter((q) => !(q.patientId === patientId && q.date === date && q.slot === slot));
+    emit(data, now, "event.appTaken", { patient: { $person: patientId }, slot: { $t: `slotWord.${slot}` } }, ["patient", "family", "nurse", "doctor", "admin"], "ok", patientId);
+    emit(data, now, "event.logWritten", { patient: { $person: patientId }, slot: { $t: `slotWord.${slot}` } }, ["family", "nurse", "doctor", "admin"], "ok", patientId);
+  });
 }

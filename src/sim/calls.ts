@@ -1,5 +1,5 @@
 import { isAfterDayEnd } from "@/call-engine/day";
-import { replay, step, type Effect, type StepResult } from "@/call-engine/machine";
+import { intentFor, replay, step, type CallPhase, type Effect, type StepResult } from "@/call-engine/machine";
 import type { DemoData } from "@/domain/data";
 import { findPatient, nextId } from "@/domain/data";
 import type { CallContext, CallInput, CallRecord, Lang, Patient, QueuedCall } from "@/domain/types";
@@ -51,7 +51,7 @@ export function placeCall(data: DemoData, q: QueuedCall, at: number, opts: CallR
       data,
       at,
       q.reason === "scheduled" ? "event.callPlaced" : "event.callPlacedAgain",
-      { patient: { $person: p.id }, slot: { $t: `slot.${q.slot}` }, attempt: q.attempt },
+      { patient: { $person: p.id }, slot: { $t: `slotWord.${q.slot}` }, attempt: q.attempt },
       ["patient", "nurse", "admin"],
       "info",
       p.id,
@@ -91,22 +91,21 @@ function describeStep(data: DemoData, call: CallRecord, input: CallInput, r: Ste
   if (input.type === "answer" && phaseBefore === "ringing") {
     emit(data, at, "event.answered", { patient: who }, ["patient", "nurse", "admin"], "info", pid);
   }
-  if (input.type === "reply") {
-    const understood = input.via === "key" ? `event.keyPressed` : "event.replyUnderstood";
-    const intent = r.state.phase === "ended" && r.state.outcome === "unclearFlagged" ? "unclear" : input.intent;
+  if (input.type === "reply" && phaseBefore !== "ringing") {
+    const intent = intentFor(phaseBefore as CallPhase, input);
     emit(
       data,
       at,
-      understood,
-      { patient: who, key: input.key ?? "", reply: { $t: `reply.${input.via === "key" ? `key${input.key}` : intent}` } },
+      input.via === "key" ? "event.keyPressed" : "event.replyUnderstood",
+      { patient: who, key: input.key ?? "", reply: { $t: `intent.${intent}` } },
       ["nurse", "admin"],
-      "info",
+      intent === "unclear" ? "warn" : "info",
       pid,
     );
   }
   for (const line of r.lines) {
     if (line.speaker !== "system") continue;
-    if (line.key === "readBack") emit(data, at, "event.readBack", { patient: who, slot: { $t: `slot.${call.slot}` } }, ["patient", "nurse", "admin"], "info", pid);
+    if (line.key === "readBack") emit(data, at, "event.readBack", { patient: who, slot: { $t: `slotWord.${call.slot}` } }, ["patient", "nurse", "admin"], "info", pid);
     if (line.key === "keypadMenu") emit(data, at, "event.keypadMenu", { patient: who }, ["nurse", "admin"], "warn", pid);
   }
   if (input.type === "noAnswer" || (input.type === "hangUp" && r.state.outcome?.startsWith("noAnswer"))) {
@@ -117,7 +116,7 @@ function describeStep(data: DemoData, call: CallRecord, input: CallInput, r: Ste
 function applyEffects(data: DemoData, call: CallRecord, effects: Effect[], at: number, opts: CallRunOptions) {
   const p = findPatient(data, call.patientId)!;
   const who = { $person: p.id };
-  const slot = { $t: `slot.${call.slot}` };
+  const slot = { $t: `slotWord.${call.slot}` };
   for (const e of effects) {
     switch (e.type) {
       case "logDose": {

@@ -56,7 +56,7 @@ export function closeFlag(data: DemoData, flag: Flag, at: number, by: string, in
         confirmation: "nurseCall",
         replaces: existing?.id,
       });
-      emit(data, at, "event.logWritten", { patient: { $person: pid }, slot: { $t: `slot.${flag.slot}` } }, ["family", "nurse", "doctor", "admin"], "ok", pid);
+      emit(data, at, "event.logWritten", { patient: { $person: pid }, slot: { $t: `slotWord.${flag.slot}` } }, ["family", "nurse", "doctor", "admin"], "ok", pid);
     }
   }
   emit(data, at, "event.flagClosed", { flag: { $t: `flag.type.${flag.type}` }, patient: { $person: pid }, person: { $person: by } }, ["nurse", "admin"], "ok", pid);

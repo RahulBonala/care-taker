@@ -494,3 +494,23 @@ export function buildSeed(opts: SeedOptions = {}): { data: DemoData; now: number
   data.events = data.events.filter((e) => e.at >= until - 6 * 3_600_000);
   return { data, now };
 }
+
+/** Medicines as written on a patient's discharge summary (the nurse types these in). */
+export function sampleMedicinesFor(patientId: string, start: LocalDate): Medicine[] {
+  const s = PATIENTS.find((x) => x.id === patientId);
+  const meds = s?.meds ?? [
+    { name: "Paracetamol", dose: "500 mg", perDose: 1, slots: ["breakfast", "dinner"] as Slot[], food: "after" as const, dispensed: 20, days: 10 },
+    { name: "Pantoprazole", dose: "40 mg", perDose: 1, slots: ["breakfast"] as Slot[], food: "before" as const, dispensed: 14 },
+  ];
+  return meds.map((m, i) => ({
+    id: `${patientId}_m${i + 1}`,
+    name: m.name,
+    dose: m.dose,
+    perDose: m.perDose,
+    slots: [...m.slots],
+    food: m.food,
+    dispensed: m.dispensed,
+    startDate: start,
+    endDate: addDays(start, (m.days ?? 14) - 1),
+  }));
+}

@@ -89,3 +89,13 @@ export function expectedPillCounts(data: DemoData, p: Patient, at: number): Pill
     return { medicineId: m.id, expected: Math.max(0, baseline - taken), counted: NaN };
   });
 }
+
+/** Plausible ranges for typing vitals in (data entry checks, not clinical advice). */
+export const VITAL_RANGES = {
+  bpSys: [70, 250],
+  bpDia: [40, 150],
+  pulse: [30, 200],
+  tempC: [34, 42],
+  spo2: [70, 100],
+  sugar: [40, 600],
+} as const;
