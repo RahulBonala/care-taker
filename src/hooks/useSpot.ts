@@ -8,7 +8,7 @@ import { useDemo } from "@/store/store";
  * <Button {...useSpot("desk.enrol.submit")} />
  */
 export function useSpot<T extends HTMLElement = HTMLElement>(id: string) {
-  const on = useDemo((s) => s.ui.highlight === id);
+  const on = useDemo((s) => Boolean(s.ui.highlight && s.ui.highlight.split(",").includes(id)));
   const ref = useRef<T | null>(null);
   useEffect(() => {
     if (on && ref.current) ref.current.scrollIntoView({ block: "center", behavior: "smooth" });

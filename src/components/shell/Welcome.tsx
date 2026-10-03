@@ -8,10 +8,12 @@ import { ROLES } from "@/domain/types";
 import { brandTagline } from "@/i18n";
 import { useT } from "@/i18n/useT";
 import { startStory } from "@/store/story";
+import { useRoleNav } from "./useRoleNav";
 import { BrandMark } from "./BrandMark";
 
 export function Welcome() {
   const { t, list, lang } = useT();
+  const navigate = useRoleNav();
   return (
     <div className="mx-auto w-full max-w-5xl space-y-10 px-4 py-8 sm:px-8 sm:py-12">
       <header className="space-y-4">
@@ -19,7 +21,7 @@ export function Welcome() {
         <h1 className="text-3xl font-bold leading-tight sm:text-4xl">{brandTagline(lang)}</h1>
         <p className="max-w-2xl text-lg text-muted">{t("welcome.intro")}</p>
         <div className="flex flex-wrap gap-3">
-          <Button variant="primary" size="lg" icon={BookOpen} onClick={startStory}>
+          <Button variant="primary" size="lg" icon={BookOpen} onClick={() => startStory(navigate)}>
             {t("welcome.startStory")}
           </Button>
           <Link href="/how-it-works/" className="inline-flex min-h-14 items-center gap-2 rounded-2xl border border-line bg-surface px-5 text-lg font-semibold hover:bg-surface-2">

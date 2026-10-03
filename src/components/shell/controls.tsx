@@ -238,13 +238,14 @@ export function SplitControls() {
 
 export function StoryToggle({ full, short }: { full?: boolean; short?: boolean }) {
   const { t } = useT();
+  const navigate = useRoleNav();
   const active = useDemo((s) => s.story.active);
   return active ? (
     <Button size="sm" variant="secondary" icon={X} onClick={exitStory} className={full ? "w-full" : undefined}>
       {t("shell.exitStory")}
     </Button>
   ) : (
-    <Button size="sm" variant="soft" icon={BookOpen} onClick={startStory} className={full ? "w-full" : undefined} title={t("shell.startStory")}>
+    <Button size="sm" variant="soft" icon={BookOpen} onClick={() => startStory(navigate)} className={full ? "w-full" : undefined} title={t("shell.startStory")}>
       {short ? t("shell.story") : t("shell.startStory")}
     </Button>
   );

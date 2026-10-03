@@ -6,61 +6,18 @@ import { PrintPortal } from "@/components/shared/PrintPortal";
 import { Banner, Button, Card, Checkbox, Chip, Field, Input, Screen, ScreenTitle, Segmented, Select } from "@/components/ui";
 import { useActingAs, useRepos } from "@/data/useRepos";
 import { MONTH_DAYS, PACKAGE_LENGTHS } from "@/domain/packages";
-import { DEFAULT_MEAL_TIMES } from "@/domain/schedule";
 import { SLOTS, type Lang, type PackageKind, type Relation } from "@/domain/types";
 import { useSpot } from "@/hooks/useSpot";
 import { LANG_CODES, LANGUAGES } from "@/i18n";
 import { useT } from "@/i18n/useT";
 import { cn } from "@/lib/cn";
 import { enrolPatient, printedHandout, setUploadFails, type EnrolForm } from "@/store/roleActions";
+import { EMPTY_ENROL, LAKSHMI_ENROL } from "@/store/enrolForms";
 import { useDemo } from "@/store/store";
 import { Handout } from "./Handout";
 
 const RELATIONS: Relation[] = ["son", "daughter", "husband", "wife", "brother", "sister", "grandson", "granddaughter", "daughterInLaw", "sonInLaw", "nephew", "niece"];
 const KINDS: PackageKind[] = ["call", "callVisit", "full", "monthly"];
-
-const EMPTY: EnrolForm = {
-  name: "",
-  honorific: "mrs",
-  gender: "f",
-  age: 65,
-  phone: "",
-  language: "te",
-  phoneType: "keypad",
-  meals: { ...DEFAULT_MEAL_TIMES },
-  address: "",
-  condition: "",
-  doctorId: "d_anjali",
-  familyName: "",
-  familyPhone: "",
-  relation: "son",
-  kind: "callVisit",
-  lengthDays: 14,
-  payAtDesk: false,
-  consent: { calls: false, shareFamily: false, shareDoctor: false },
-};
-
-/** The demo's sample discharge: Mrs Lakshmi Devi. */
-const LAKSHMI_FORM: EnrolForm = {
-  ...EMPTY,
-  sample: "p_lakshmi",
-  name: "Lakshmi Devi",
-  honorific: "mrs",
-  gender: "f",
-  age: 67,
-  phone: "+91 90000 00101",
-  language: "te",
-  phoneType: "keypad",
-  meals: { ...DEFAULT_MEAL_TIMES, breakfast: "08:00", lunch: "13:00", dinner: "19:00" },
-  address: "12-3-45, Street 4, Malkajgiri, Hyderabad",
-  condition: "After knee replacement",
-  doctorId: "d_anjali",
-  familyName: "Ravi Kumar",
-  familyPhone: "+1 201 555 0142",
-  relation: "son",
-  kind: "callVisit",
-  lengthDays: 14,
-};
 
 type Step = 0 | 1 | 2 | 3;
 
@@ -71,7 +28,7 @@ export function DeskEnrol() {
   const now = useDemo((s) => s.now);
   const uploadFails = useDemo((s) => s.data?.settings.uploadFails ?? false);
   const lakshmiEnrolled = useDemo((s) => Boolean(s.data?.patients.some((p) => p.id === "p_lakshmi")));
-  const [form, setForm] = useState<EnrolForm>(EMPTY);
+  const [form, setForm] = useState<EnrolForm>(EMPTY_ENROL);
   const [step, setStep] = useState<Step>(0);
   const [error, setError] = useState("");
   const [upload, setUpload] = useState<"none" | "busy" | "done" | "failed">("none");
@@ -152,7 +109,7 @@ export function DeskEnrol() {
             </PrintPortal>
           </>
         )}
-        <Button variant="primary" icon={UserPlus} onClick={() => { setForm(EMPTY); setStep(0); setDoneId(null); setStarted(null); setElapsed(0); setUpload("none"); }}>
+        <Button variant="primary" icon={UserPlus} onClick={() => { setForm(EMPTY_ENROL); setStep(0); setDoneId(null); setStarted(null); setElapsed(0); setUpload("none"); }}>
           {t("desk.enrol.enrolAnother")}
         </Button>
       </Screen>
@@ -175,7 +132,7 @@ export function DeskEnrol() {
         }
       />
       {!lakshmiEnrolled && (
-        <Button ref={fillSpot.ref} className={fillSpot.className} variant="soft" icon={Sparkles} onClick={() => { set(LAKSHMI_FORM); }}>
+        <Button ref={fillSpot.ref} className={fillSpot.className} variant="soft" icon={Sparkles} onClick={() => { set(LAKSHMI_ENROL); }}>
           {t("desk.enrol.fillSample")}
         </Button>
       )}

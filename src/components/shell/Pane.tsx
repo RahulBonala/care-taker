@@ -10,6 +10,7 @@ import { ErrorState, OfflineNotice, ScreenSkeleton, Select, Sheet } from "@/comp
 import type { Role } from "@/domain/types";
 import { ROLES } from "@/domain/types";
 import { useOnline } from "@/hooks/useMedia";
+import { useSpot } from "@/hooks/useSpot";
 import { useT } from "@/i18n/useT";
 import { setUi, useDemo } from "@/store/store";
 import { PaneContext, usePane, type PaneInfo } from "./PaneContext";
@@ -66,24 +67,27 @@ function RoleLayout({ children, scroller }: { children: ReactNode; scroller: Rea
 
 function NavLink({ item, className, children, onClick }: { item: ScreenDef; className: string; children: ReactNode; onClick?: () => void }) {
   const { primary, href, go, role, screen } = usePane();
+  const spot = useSpot<HTMLAnchorElement & HTMLButtonElement>(`nav.${role}.${item.id || "home"}`);
   const current = findScreen(role, screen);
   const active = item.id === screen || current.parent === item.id;
+  const cls = spot.className ? `${className} ${spot.className}` : className;
   if (primary) {
     return (
-      <Link href={href(item.id)} onClick={onClick} aria-current={active ? "page" : undefined} className={className} data-active={active}>
+      <Link ref={spot.ref} href={href(item.id)} onClick={onClick} aria-current={active ? "page" : undefined} className={cls} data-active={active}>
         {children}
       </Link>
     );
   }
   return (
     <button
+      ref={spot.ref}
       type="button"
       onClick={() => {
         go(item.id);
         onClick?.();
       }}
       aria-current={active ? "page" : undefined}
-      className={className}
+      className={cls}
       data-active={active}
     >
       {children}
