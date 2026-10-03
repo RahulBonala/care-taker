@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useDemo } from "@/store/store";
 
 /**
@@ -9,10 +9,11 @@ import { useDemo } from "@/store/store";
  */
 export function useSpot<T extends HTMLElement = HTMLElement>(id: string) {
   const on = useDemo((s) => Boolean(s.ui.highlight && s.ui.highlight.split(",").includes(id)));
-  const ref = useRef<T | null>(null);
+  // A callback ref (the state setter) so the element is known without reading a ref during render.
+  const [el, ref] = useState<T | null>(null);
   useEffect(() => {
-    if (on && ref.current) ref.current.scrollIntoView({ block: "center", behavior: "smooth" });
-  }, [on]);
+    if (on && el) el.scrollIntoView({ block: "center", behavior: "smooth" });
+  }, [on, el]);
   return { ref, "data-spot": id, className: on ? "spot-on" : undefined } as const;
 }
 

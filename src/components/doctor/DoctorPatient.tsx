@@ -28,13 +28,17 @@ export function DoctorPatient() {
   const p = repos.patients.get(selected);
   const [review, setReview] = useState(p?.nextReviewDate ?? "");
   const [reviewSaved, setReviewSaved] = useState(false);
+  const [formFor, setFormFor] = useState(p?.id);
+  if (formFor !== p?.id) {
+    setFormFor(p?.id);
+    setReview(p?.nextReviewDate ?? "");
+    setReviewSaved(false);
+  }
   const [length, setLength] = useState<PackageLength>(14);
-  const reviewSpot = useSpot<HTMLButtonElement>("doctor.review");
+  const { ref: reviewSpotRef, className: reviewSpotCls } = useSpot<HTMLButtonElement>("doctor.review");
 
   useEffect(() => {
     if (p) viewed(doctorId, "doctor", p.id, "audit.viewedPatient", p.id);
-    setReview(p?.nextReviewDate ?? "");
-    setReviewSaved(false);
   }, [p?.id, doctorId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!p) {
@@ -134,8 +138,8 @@ export function DoctorPatient() {
               </Field>
               {reviewSaved && <Banner tone="ok">{t("doctor.summary.reviewSaved")}</Banner>}
               <Button
-                ref={reviewSpot.ref}
-                className={reviewSpot.className}
+                ref={reviewSpotRef}
+                className={reviewSpotCls}
                 variant="primary"
                 icon={CalendarCheck}
                 disabled={!review}

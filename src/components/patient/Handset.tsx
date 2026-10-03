@@ -27,9 +27,9 @@ export function Handset(props: Props) {
 
 function KeypadPhone({ state, keysEnabled, onAnswer, onDecline, onHangUp, onKey, clock }: Props) {
   const { t, app } = useT();
-  const answer = useSpot<HTMLButtonElement>("patient.answer");
-  const decline = useSpot<HTMLButtonElement>("patient.decline");
-  const k1 = useSpot<HTMLButtonElement>("patient.key1");
+  const { ref: answerRef, className: answerCls } = useSpot<HTMLButtonElement>("patient.answer");
+  const { ref: declineRef, className: declineCls } = useSpot<HTMLButtonElement>("patient.decline");
+  const { ref: k1Ref, className: k1Cls } = useSpot<HTMLButtonElement>("patient.key1");
   const ringing = state === "ringing";
   const inCall = state === "active";
   const keys = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "*", "0", "#"];
@@ -61,22 +61,22 @@ function KeypadPhone({ state, keysEnabled, onAnswer, onDecline, onHangUp, onKey,
       </div>
       <div className="mt-4 grid grid-cols-2 gap-3">
         <button
-          ref={answer.ref}
+          ref={answerRef}
           type="button"
           onClick={onAnswer}
           disabled={!ringing}
           aria-label={t("patient.answer")}
-          className={cn("flex h-12 items-center justify-center rounded-2xl bg-[#1f8a4c] text-white disabled:opacity-35", ringing && "ring-shake", answer.className)}
+          className={cn("flex h-12 items-center justify-center rounded-2xl bg-[#1f8a4c] text-white disabled:opacity-35", ringing && "ring-shake", answerCls)}
         >
           <Phone aria-hidden size={22} />
         </button>
         <button
-          ref={decline.ref}
+          ref={declineRef}
           type="button"
           onClick={inCall ? onHangUp : onDecline}
           disabled={!ringing && !inCall}
           aria-label={inCall ? t("patient.hangUp") : t("patient.decline")}
-          className={cn("flex h-12 items-center justify-center rounded-2xl bg-[#c0362c] text-white disabled:opacity-35", decline.className)}
+          className={cn("flex h-12 items-center justify-center rounded-2xl bg-[#c0362c] text-white disabled:opacity-35", declineCls)}
         >
           <PhoneOff aria-hidden size={22} />
         </button>
@@ -87,7 +87,7 @@ function KeypadPhone({ state, keysEnabled, onAnswer, onDecline, onHangUp, onKey,
           return (
             <button
               key={k}
-              ref={k === "1" ? k1.ref : undefined}
+              ref={k === "1" ? k1Ref : undefined}
               type="button"
               disabled={!live}
               onClick={() => onKey(k as "1" | "2" | "3")}
@@ -95,7 +95,7 @@ function KeypadPhone({ state, keysEnabled, onAnswer, onDecline, onHangUp, onKey,
               className={cn(
                 "flex h-11 items-center justify-center rounded-xl text-lg font-bold text-[#e9eef1] disabled:cursor-default",
                 live ? "bg-[#4a555c] hover:bg-[#5b676f]" : "bg-[#2b3237] text-[#8b979e]",
-                k === "1" && k1.className,
+                k === "1" && k1Cls,
               )}
             >
               {k}
@@ -109,8 +109,8 @@ function KeypadPhone({ state, keysEnabled, onAnswer, onDecline, onHangUp, onKey,
 
 function SmartPhone({ state, keysEnabled, onAnswer, onDecline, onHangUp, onKey, clock }: Props) {
   const { t, app } = useT();
-  const answer = useSpot<HTMLButtonElement>("patient.answer");
-  const decline = useSpot<HTMLButtonElement>("patient.decline");
+  const { ref: answerRef, className: answerCls } = useSpot<HTMLButtonElement>("patient.answer");
+  const { ref: declineRef, className: declineCls } = useSpot<HTMLButtonElement>("patient.decline");
   const ringing = state === "ringing";
   const inCall = state === "active";
   return (
@@ -151,13 +151,13 @@ function SmartPhone({ state, keysEnabled, onAnswer, onDecline, onHangUp, onKey, 
         <div className="mt-6 flex items-end justify-around">
           {ringing && (
             <>
-              <button ref={decline.ref} type="button" onClick={onDecline} className={cn("flex flex-col items-center gap-1 rounded-2xl", decline.className)}>
+              <button ref={declineRef} type="button" onClick={onDecline} className={cn("flex flex-col items-center gap-1 rounded-2xl", declineCls)}>
                 <span className="flex h-14 w-14 items-center justify-center rounded-full bg-[#d23b30]">
                   <PhoneOff aria-hidden size={24} />
                 </span>
                 <span className="text-sm">{t("patient.decline")}</span>
               </button>
-              <button ref={answer.ref} type="button" onClick={onAnswer} className={cn("flex flex-col items-center gap-1 rounded-2xl", answer.className)}>
+              <button ref={answerRef} type="button" onClick={onAnswer} className={cn("flex flex-col items-center gap-1 rounded-2xl", answerCls)}>
                 <span className="ring-shake flex h-14 w-14 items-center justify-center rounded-full bg-[#22a35a]">
                   <Phone aria-hidden size={24} />
                 </span>

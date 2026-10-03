@@ -50,6 +50,8 @@ const en = {
     notAllowed: "This role cannot see this.",
     selectFirst: "Choose an item from the list first.",
     goToList: "Go to the list",
+    notFound: "There is no screen at this address.",
+    goToStart: "Go to the start",
     phone: "Phone",
     address: "Address",
     language: "Language",

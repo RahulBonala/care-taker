@@ -182,7 +182,7 @@ export const STEPS: Step[] = [
         if (f.status === "open") nurseStartCall(f.id, "n_mary");
         nurseCloseFlag(f.id, "n_mary", { outcome: SAMPLE_OUTCOMES.unwell!, spoke: true });
       }
-      setUi((ui) => ({ split: { on: true, right: { role: "family", screen: "" } } }));
+      setUi({ split: { on: true, right: { role: "family", screen: "" } } });
     },
     done: (s) => Boolean(s.data?.flags.some((f) => f.patientId === L && f.type === "unwell" && f.status === "closed")),
     spot: (s) => {

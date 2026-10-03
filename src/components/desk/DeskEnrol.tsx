@@ -36,10 +36,10 @@ export function DeskEnrol() {
   const [elapsed, setElapsed] = useState(0);
   const [doneId, setDoneId] = useState<string | null>(null);
   const [took, setTook] = useState(0);
-  const fillSpot = useSpot<HTMLButtonElement>("desk.fill");
-  const nextSpot = useSpot<HTMLButtonElement>("desk.next");
-  const consentSpot = useSpot<HTMLDivElement>("desk.consent");
-  const finishSpot = useSpot<HTMLButtonElement>("desk.finish");
+  const { ref: fillSpotRef, className: fillSpotCls } = useSpot<HTMLButtonElement>("desk.fill");
+  const { ref: nextSpotRef, className: nextSpotCls } = useSpot<HTMLButtonElement>("desk.next");
+  const { ref: consentSpotRef, className: consentSpotCls } = useSpot<HTMLDivElement>("desk.consent");
+  const { ref: finishSpotRef, className: finishSpotCls } = useSpot<HTMLButtonElement>("desk.finish");
   const doctors = repos.staff.list("doctor");
   const packages = repos.packages;
 
@@ -132,7 +132,7 @@ export function DeskEnrol() {
         }
       />
       {!lakshmiEnrolled && (
-        <Button ref={fillSpot.ref} className={fillSpot.className} variant="soft" icon={Sparkles} onClick={() => { set(LAKSHMI_ENROL); }}>
+        <Button ref={fillSpotRef} className={fillSpotCls} variant="soft" icon={Sparkles} onClick={() => { set(LAKSHMI_ENROL); }}>
           {t("desk.enrol.fillSample")}
         </Button>
       )}
@@ -260,7 +260,7 @@ export function DeskEnrol() {
         )}
 
         {step === 2 && (
-          <div ref={consentSpot.ref} className={cn("space-y-1", consentSpot.className)}>
+          <div ref={consentSpotRef} className={cn("space-y-1", consentSpotCls)}>
             <p className="text-muted">{t("desk.enrol.consentIntro")}</p>
             <Checkbox checked={form.consent.calls} onChange={(v) => set({ consent: { ...form.consent, calls: v } })} label={t("desk.enrol.consentCalls")} />
             <Checkbox checked={form.consent.shareFamily} onChange={(v) => set({ consent: { ...form.consent, shareFamily: v } })} label={t("desk.enrol.consentFamily")} hint={form.familyName ? `${form.familyName} · ${t(`relation.${form.relation}`)}` : undefined} />
@@ -298,11 +298,11 @@ export function DeskEnrol() {
             {t("desk.enrol.back")}
           </Button>
           {step < 3 ? (
-            <Button ref={nextSpot.ref} className={nextSpot.className} variant="primary" iconRight={ArrowRight} onClick={next}>
+            <Button ref={nextSpotRef} className={nextSpotCls} variant="primary" iconRight={ArrowRight} onClick={next}>
               {t("desk.enrol.next")}
             </Button>
           ) : (
-            <Button ref={finishSpot.ref} className={finishSpot.className} variant="primary" icon={UserPlus} onClick={finish} disabled={upload === "busy"}>
+            <Button ref={finishSpotRef} className={finishSpotCls} variant="primary" icon={UserPlus} onClick={finish} disabled={upload === "busy"}>
               {t("desk.enrol.finish")}
             </Button>
           )}

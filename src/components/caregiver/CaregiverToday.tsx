@@ -38,12 +38,12 @@ export function CaregiverToday() {
 function VisitRow({ v, onOpen }: { v: Visit; onOpen: () => void }) {
   const { t, time, person, text, weekdayDate } = useT();
   const p = useDemo((s) => s.data?.patients.find((x) => x.id === v.patientId));
-  const spot = useSpot<HTMLButtonElement>(`caregiver.visit.${v.patientId}`);
+  const { ref: spotRef, className: spotCls } = useSpot<HTMLButtonElement>(`caregiver.visit.${v.patientId}`);
   const status = v.status === "completed" ? { tone: "ok" as const, label: t("caregiver.today.done") } : v.status === "missed" ? { tone: "danger" as const, label: t("caregiver.today.missed") } : v.status === "checkedIn" ? { tone: "info" as const, label: t("caregiver.today.inProgress") } : { tone: "neutral" as const, label: t("caregiver.today.due") };
   return (
     <li>
       <Card className="p-0">
-        <button ref={spot.ref} type="button" onClick={onOpen} className={`flex w-full items-start gap-3 rounded-2xl p-4 text-left hover:bg-surface-2 ${spot.className ?? ""}`}>
+        <button ref={spotRef} type="button" onClick={onOpen} className={`flex w-full items-start gap-3 rounded-2xl p-4 text-left hover:bg-surface-2 ${spotCls ?? ""}`}>
           <div className="min-w-0 flex-1 space-y-1">
             <p className="font-semibold text-brand tabular-nums">
               {time(atLocal(v.date, v.windowStart))} · {weekdayDate(v.date)}

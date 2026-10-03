@@ -39,17 +39,17 @@ export function ReportLines({ lines }: { lines: ReportLine[] }) {
 
 function LineItem({ line, open, onToggle, spot }: { line: ReportLine; open: boolean; onToggle: () => void; spot: boolean }) {
   const tr = useT();
-  const s = useSpot<HTMLButtonElement>(spot ? "family.report.line" : `report.line.${line.id}`);
+  const { ref: sRef, className: sCls } = useSpot<HTMLButtonElement>(spot ? "family.report.line" : `report.line.${line.id}`);
   const style = LINE_ICON[line.icon];
   const Icon = style.icon;
   return (
     <li>
       <button
-        ref={s.ref}
+        ref={sRef}
         type="button"
         aria-expanded={open}
         onClick={onToggle}
-        className={cn("flex min-h-14 w-full items-start gap-3 px-4 py-3 text-left hover:bg-surface-2", line.kind === "summary" && "bg-surface-2 font-semibold", s.className)}
+        className={cn("flex min-h-14 w-full items-start gap-3 px-4 py-3 text-left hover:bg-surface-2", line.kind === "summary" && "bg-surface-2 font-semibold", sCls)}
       >
         <Icon aria-hidden size={22} className={cn("mt-0.5 shrink-0", style.cls)} />
         <span className="min-w-0 flex-1">{lineTextFor(line, tr)}</span>

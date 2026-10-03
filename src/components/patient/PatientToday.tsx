@@ -20,7 +20,7 @@ export function PatientToday() {
   const p = repos.patients.get(useActingAs());
   const now = useDemo((s) => s.now);
   const [confirm, setConfirm] = useState<Slot | null>(null);
-  const spot = useSpot<HTMLButtonElement>("patient.today.taken");
+  const { ref: spotRef, className: spotCls } = useSpot<HTMLButtonElement>("patient.today.taken");
   if (!p) return <Screen><EmptyState title={t("common.notAllowed")} /></Screen>;
   const date = localDate(now);
   const views = repos.doses.day(p, date, now);
@@ -61,14 +61,14 @@ export function PatientToday() {
                   </ul>
                   {open && (
                     <Button
-                      ref={i === views.findIndex((x) => x.status === "due" || x.status === "postponed") ? spot.ref : undefined}
+                      ref={i === views.findIndex((x) => x.status === "due" || x.status === "postponed") ? spotRef : undefined}
                       size="xl"
                       variant={reached ? "ok" : "secondary"}
                       full
                       icon={CircleCheck}
                       disabled={!reached}
                       onClick={() => setConfirm(v.slot)}
-                      className={i === views.findIndex((x) => x.status === "due" || x.status === "postponed") ? spot.className : undefined}
+                      className={i === views.findIndex((x) => x.status === "due" || x.status === "postponed") ? spotCls : undefined}
                     >
                       {reached ? t("patient.takenButton", { slot: t(`slot.${v.slot}`) }) : t("patient.notYetTime")}
                     </Button>

@@ -26,9 +26,9 @@ export function NurseFlag() {
   const [spoke, setSpoke] = useState(true);
   const [doseTaken, setDoseTaken] = useState(false);
   const [error, setError] = useState("");
-  const callSpot = useSpot<HTMLButtonElement>("nurse.flag.call");
-  const closeSpot = useSpot<HTMLButtonElement>("nurse.flag.close");
-  const noteSpot = useSpot<HTMLTextAreaElement>("nurse.flag.note");
+  const { ref: callSpotRef, className: callSpotCls } = useSpot<HTMLButtonElement>("nurse.flag.call");
+  const { ref: closeSpotRef, className: closeSpotCls } = useSpot<HTMLButtonElement>("nurse.flag.close");
+  const { ref: noteSpotRef, className: noteSpotCls } = useSpot<HTMLTextAreaElement>("nurse.flag.note");
 
   useEffect(() => {
     if (f) viewed(nurseId, "nurse", f.id, "audit.viewedFlag", f.patientId, { flag: { $t: `flag.type.${f.type}` } });
@@ -106,7 +106,7 @@ export function NurseFlag() {
       ) : (
         <Card className="space-y-4">
           {f.status === "open" ? (
-            <Button ref={callSpot.ref} className={callSpot.className} variant="primary" size="lg" icon={Phone} onClick={() => nurseStartCall(f.id, nurseId)}>
+            <Button ref={callSpotRef} className={callSpotCls} variant="primary" size="lg" icon={Phone} onClick={() => nurseStartCall(f.id, nurseId)}>
               {isFamily ? t("nurse.flag.callFamily") : t("nurse.flag.callPatient")}
             </Button>
           ) : (
@@ -115,11 +115,11 @@ export function NurseFlag() {
             </Banner>
           )}
           <Field label={t("nurse.flag.outcome")} htmlFor="outcome" error={error}>
-            <Textarea ref={noteSpot.ref} id="outcome" value={outcome} onChange={(e) => setOutcome(e.target.value)} placeholder={t("nurse.flag.outcomePlaceholder")} className={noteSpot.className} />
+            <Textarea ref={noteSpotRef} id="outcome" value={outcome} onChange={(e) => setOutcome(e.target.value)} placeholder={t("nurse.flag.outcomePlaceholder")} className={noteSpotCls} />
           </Field>
           <Checkbox checked={spoke} onChange={setSpoke} label={isFamily ? t("nurse.flag.spokeFamily") : t("nurse.flag.spoke")} />
           {f.slot && !isFamily && <Checkbox checked={doseTaken} onChange={setDoseTaken} label={t("nurse.flag.doseOnCall", { slot: t(`slotWord.${f.slot}`) })} />}
-          <Button ref={closeSpot.ref} className={closeSpot.className} variant="ok" size="lg" icon={CircleCheck} onClick={close}>
+          <Button ref={closeSpotRef} className={closeSpotCls} variant="ok" size="lg" icon={CircleCheck} onClick={close}>
             {t("nurse.flag.close")}
           </Button>
         </Card>

@@ -67,20 +67,20 @@ function RoleLayout({ children, scroller }: { children: ReactNode; scroller: Rea
 
 function NavLink({ item, className, children, onClick }: { item: ScreenDef; className: string; children: ReactNode; onClick?: () => void }) {
   const { primary, href, go, role, screen } = usePane();
-  const spot = useSpot<HTMLAnchorElement & HTMLButtonElement>(`nav.${role}.${item.id || "home"}`);
+  const { ref: spotRef, className: spotCls } = useSpot<HTMLElement>(`nav.${role}.${item.id || "home"}`);
   const current = findScreen(role, screen);
   const active = item.id === screen || current.parent === item.id;
-  const cls = spot.className ? `${className} ${spot.className}` : className;
+  const cls = spotCls ? `${className} ${spotCls}` : className;
   if (primary) {
     return (
-      <Link ref={spot.ref} href={href(item.id)} onClick={onClick} aria-current={active ? "page" : undefined} className={cls} data-active={active}>
+      <Link ref={spotRef} href={href(item.id)} onClick={onClick} aria-current={active ? "page" : undefined} className={cls} data-active={active}>
         {children}
       </Link>
     );
   }
   return (
     <button
-      ref={spot.ref}
+      ref={spotRef}
       type="button"
       onClick={() => {
         go(item.id);

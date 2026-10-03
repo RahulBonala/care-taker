@@ -57,8 +57,8 @@ export function FamilyHome() {
   const data = useDemo((s) => s.data)!;
   const [callback, setCallback] = useState(false);
   const [sent, setSent] = useState(false);
-  const cbSpot = useSpot<HTMLButtonElement>("family.callback");
-  const reportSpot = useSpot<HTMLButtonElement>("family.openReport");
+  const { ref: cbSpotRef, className: cbSpotCls } = useSpot<HTMLButtonElement>("family.callback");
+  const { ref: reportSpotRef, className: reportSpotCls } = useSpot<HTMLButtonElement>("family.openReport");
   if (!f || !p) return <Screen><EmptyState title={t("common.notAllowed")} /></Screen>;
 
   const today = localDate(now);
@@ -171,10 +171,10 @@ export function FamilyHome() {
       </div>
 
       <div className="flex flex-wrap gap-3">
-        <Button ref={reportSpot.ref} variant="primary" size="lg" icon={FileText} onClick={() => pane.go("report")} className={reportSpot.className}>
+        <Button ref={reportSpotRef} variant="primary" size="lg" icon={FileText} onClick={() => pane.go("report")} className={reportSpotCls}>
           {t("family.home.openReport")}
         </Button>
-        <Button ref={cbSpot.ref} size="lg" icon={PhoneCall} onClick={() => { setSent(false); setCallback(true); }} className={cbSpot.className}>
+        <Button ref={cbSpotRef} size="lg" icon={PhoneCall} onClick={() => { setSent(false); setCallback(true); }} className={cbSpotCls}>
           {t("family.home.requestCallback")}
         </Button>
       </div>

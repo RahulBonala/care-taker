@@ -62,12 +62,12 @@ export function NurseFlags() {
 
 function FlagRow({ f, onOpen, spot }: { f: Flag; onOpen: () => void; spot: boolean }) {
   const { t, person, time, dayMonth } = useT();
-  const s = useSpot<HTMLButtonElement>(spot ? "nurse.flag.urgent" : `nurse.flag.${f.id}`);
+  const { ref: sRef, className: sCls } = useSpot<HTMLButtonElement>(spot ? "nurse.flag.urgent" : `nurse.flag.${f.id}`);
   const style = flagStyle(f);
   return (
     <li>
       <Card className="p-0">
-        <button ref={s.ref} type="button" onClick={onOpen} className={`flex w-full items-start gap-3 rounded-2xl p-4 text-left hover:bg-surface-2 ${s.className ?? ""}`}>
+        <button ref={sRef} type="button" onClick={onOpen} className={`flex w-full items-start gap-3 rounded-2xl p-4 text-left hover:bg-surface-2 ${sCls ?? ""}`}>
           <div className="min-w-0 flex-1 space-y-1">
             <div className="flex flex-wrap items-center gap-2">
               <Chip size="sm" tone={style.tone} icon={style.icon}>

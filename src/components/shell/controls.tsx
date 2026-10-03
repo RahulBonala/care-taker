@@ -36,11 +36,11 @@ export function RoleSwitcher({ current, layout = "row", onPicked }: { current: R
 }
 
 function RoleButton({ role, on, label, Icon, onClick, layout }: { role: Role; on: boolean; label: string; Icon: (typeof ROLE_ICONS)[Role]; onClick: () => void; layout: "row" | "grid" }) {
-  const spot = useSpot<HTMLButtonElement>(`role.${role}`);
+  const { ref: spotRef, className: spotCls } = useSpot<HTMLButtonElement>(`role.${role}`);
   return (
     <button
-      ref={spot.ref}
-      data-spot={spot["data-spot"]}
+      ref={spotRef}
+      data-spot={`role.${role}`}
       type="button"
       onClick={onClick}
       aria-current={on ? "page" : undefined}
@@ -48,7 +48,7 @@ function RoleButton({ role, on, label, Icon, onClick, layout }: { role: Role; on
         "inline-flex min-h-11 items-center gap-1.5 rounded-xl px-2.5 text-[15px] font-semibold transition",
         layout === "grid" && "min-h-14 justify-start border border-line",
         on ? "bg-brand text-brand-ink" : "text-ink hover:bg-surface-2",
-        spot.className,
+        spotCls,
       )}
     >
       <Icon aria-hidden size={18} className="shrink-0" />
@@ -137,26 +137,26 @@ export function ClockButtons({ wrap }: { wrap?: boolean }) {
   const title = active ? t("shell.finishCallFirst") : undefined;
   const day7 = dayTarget(7);
   const day14 = dayTarget(14);
-  const s1 = useSpot<HTMLButtonElement>("clock.nextDose");
-  const s2 = useSpot<HTMLButtonElement>("clock.endOfDay");
-  const s3 = useSpot<HTMLButtonElement>("clock.nextDay");
-  const s4 = useSpot<HTMLButtonElement>("clock.day7");
-  const s5 = useSpot<HTMLButtonElement>("clock.day14");
+  const { ref: s1Ref, className: s1Cls } = useSpot<HTMLButtonElement>("clock.nextDose");
+  const { ref: s2Ref, className: s2Cls } = useSpot<HTMLButtonElement>("clock.endOfDay");
+  const { ref: s3Ref, className: s3Cls } = useSpot<HTMLButtonElement>("clock.nextDay");
+  const { ref: s4Ref, className: s4Cls } = useSpot<HTMLButtonElement>("clock.day7");
+  const { ref: s5Ref, className: s5Cls } = useSpot<HTMLButtonElement>("clock.day14");
   return (
     <div className={cn("flex gap-1.5", wrap ? "flex-wrap" : "flex-wrap")} title={title}>
-      <Button ref={s1.ref} data-spot={s1["data-spot"]} className={s1.className} size="sm" variant="primary" icon={PhoneIncoming} disabled={active} onClick={() => nextDoseTime()}>
+      <Button ref={s1Ref} data-spot="clock.nextDose" className={s1Cls} size="sm" variant="primary" icon={PhoneIncoming} disabled={active} onClick={() => nextDoseTime()}>
         {t("shell.nextDose")}
       </Button>
-      <Button ref={s2.ref} data-spot={s2["data-spot"]} className={s2.className} size="sm" icon={Moon} disabled={active} onClick={endOfDay}>
+      <Button ref={s2Ref} data-spot="clock.endOfDay" className={s2Cls} size="sm" icon={Moon} disabled={active} onClick={endOfDay}>
         {t("shell.endOfDay")}
       </Button>
-      <Button ref={s3.ref} data-spot={s3["data-spot"]} className={s3.className} size="sm" icon={Sunrise} disabled={active} onClick={nextDay}>
+      <Button ref={s3Ref} data-spot="clock.nextDay" className={s3Cls} size="sm" icon={Sunrise} disabled={active} onClick={nextDay}>
         {t("shell.nextDay")}
       </Button>
-      <Button ref={s4.ref} data-spot={s4["data-spot"]} className={s4.className} size="sm" icon={SkipForward} disabled={active || day7 == null || day7 <= now} onClick={() => jumpToDay(7)}>
+      <Button ref={s4Ref} data-spot="clock.day7" className={s4Cls} size="sm" icon={SkipForward} disabled={active || day7 == null || day7 <= now} onClick={() => jumpToDay(7)}>
         {t("shell.jumpDay", { day: 7 })}
       </Button>
-      <Button ref={s5.ref} data-spot={s5["data-spot"]} className={s5.className} size="sm" icon={SkipForward} disabled={active || day14 == null || day14 <= now} onClick={() => jumpToDay(14)}>
+      <Button ref={s5Ref} data-spot="clock.day14" className={s5Cls} size="sm" icon={SkipForward} disabled={active || day14 == null || day14 <= now} onClick={() => jumpToDay(14)}>
         {t("shell.jumpDay", { day: 14 })}
       </Button>
     </div>
@@ -209,15 +209,15 @@ export function DeviceControls() {
 export function SplitControls() {
   const { t } = useT();
   const split = useDemo((s) => s.ui.split);
-  const spot = useSpot<HTMLButtonElement>("shell.split");
+  const { ref: spotRef, className: spotCls } = useSpot<HTMLButtonElement>("shell.split");
   return (
     <div className="flex items-center gap-1.5">
       <button
-        ref={spot.ref}
+        ref={spotRef}
         type="button"
         aria-pressed={split.on}
         onClick={() => setUi({ split: { ...split, on: !split.on } })}
-        className={cn("inline-flex min-h-10 items-center gap-1.5 rounded-lg px-2.5 text-sm font-semibold", split.on ? "bg-brand-soft text-brand" : "text-muted hover:bg-surface-2 hover:text-ink", spot.className)}
+        className={cn("inline-flex min-h-10 items-center gap-1.5 rounded-lg px-2.5 text-sm font-semibold", split.on ? "bg-brand-soft text-brand" : "text-muted hover:bg-surface-2 hover:text-ink", spotCls)}
       >
         <Columns2 aria-hidden size={18} />
         <span className="hidden 2xl:inline">{t("shell.split")}</span>

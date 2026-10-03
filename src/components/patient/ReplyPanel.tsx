@@ -13,8 +13,8 @@ import { Button, Input } from "@/components/ui";
 const voice = (intent: ReplyIntent, minutes?: number): CallInput => (minutes != null ? { type: "reply", intent, via: "voice", minutes } : { type: "reply", intent, via: "voice" });
 
 function SpotButton({ spot, ...props }: React.ComponentProps<typeof Button> & { spot: string }) {
-  const s = useSpot<HTMLButtonElement>(spot);
-  return <Button ref={s.ref} data-spot={spot} {...props} className={cn(props.className, s.className)} />;
+  const { ref: sRef, className: sCls } = useSpot<HTMLButtonElement>(spot);
+  return <Button ref={sRef} data-spot={spot} {...props} className={cn(props.className, sCls)} />;
 }
 
 /** What the patient says next. The choices depend on what the system just asked. */

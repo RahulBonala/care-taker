@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import { createPortal } from "react-dom";
 
 /**
@@ -8,13 +8,7 @@ import { createPortal } from "react-dom";
  * Hidden on screen; it is the only thing on the page when printing.
  */
 export function PrintPortal({ children }: { children: ReactNode }) {
-  const [host, setHost] = useState<HTMLElement | null>(null);
-  useEffect(() => {
-    const el = document.createElement("div");
-    el.className = "print-root";
-    document.body.appendChild(el);
-    setHost(el);
-    return () => el.remove();
-  }, []);
-  return host ? createPortal(children, host) : null;
+  // The app renders only in the browser (after the saved demo loads), so document is there.
+  if (typeof document === "undefined") return null;
+  return createPortal(<div className="print-root">{children}</div>, document.body);
 }

@@ -25,7 +25,7 @@ export function DoctorPatients() {
   const repos = useRepos();
   const now = useDemo((s) => s.now);
   const [query, setQuery] = useState("");
-  const searchSpot = useSpot<HTMLInputElement>("doctor.search");
+  const { ref: searchSpotRef, className: searchSpotCls } = useSpot<HTMLInputElement>("doctor.search");
   const list = repos.patients.search(query);
   const open = (id: string) => {
     setUi((ui) => ({ selection: { ...ui.selection, doctorPatientId: id } }));
@@ -37,7 +37,7 @@ export function DoctorPatients() {
       <label className="relative block">
         <span className="sr-only">{t("doctor.list.search")}</span>
         <Search aria-hidden size={20} className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-muted" />
-        <Input ref={searchSpot.ref} type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder={t("doctor.list.search")} className={`pl-10 ${searchSpot.className ?? ""}`} />
+        <Input ref={searchSpotRef} type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder={t("doctor.list.search")} className={`pl-10 ${searchSpotCls ?? ""}`} />
       </label>
       {list.length === 0 ? (
         <EmptyState title={query ? t("doctor.list.noMatch", { query }) : t("doctor.list.empty")} />

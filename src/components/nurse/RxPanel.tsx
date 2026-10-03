@@ -25,9 +25,9 @@ export function RxPanel({ p, nurseId }: { p: Patient; nurseId: string }) {
   const [error, setError] = useState("");
   const [saved, setSaved] = useState(false);
   const [checked, setChecked] = useState<Record<string, boolean>>({});
-  const fillSpot = useSpot<HTMLButtonElement>("nurse.rx.fill");
-  const saveSpot = useSpot<HTMLButtonElement>("nurse.rx.save");
-  const verifySpot = useSpot<HTMLButtonElement>("nurse.rx.verify");
+  const { ref: fillSpotRef, className: fillSpotCls } = useSpot<HTMLButtonElement>("nurse.rx.fill");
+  const { ref: saveSpotRef, className: saveSpotCls } = useSpot<HTMLButtonElement>("nurse.rx.save");
+  const { ref: verifySpotRef, className: verifySpotCls } = useSpot<HTMLButtonElement>("nurse.rx.verify");
   const versionNo = p.prescriptions.length;
 
   const update = (i: number, patch: Partial<Medicine>) => {
@@ -140,10 +140,10 @@ export function RxPanel({ p, nurseId }: { p: Patient; nurseId: string }) {
               <Button icon={Plus} onClick={() => setMeds((list) => [...list, blankMedicine(p, list.length)])}>
                 {t("nurse.rx.add")}
               </Button>
-              <Button ref={fillSpot.ref} className={fillSpot.className} variant="soft" icon={Sparkles} onClick={() => { setSaved(false); setMeds(sampleMedicinesFor(p.id, p.pkg.startDate)); }}>
+              <Button ref={fillSpotRef} className={fillSpotCls} variant="soft" icon={Sparkles} onClick={() => { setSaved(false); setMeds(sampleMedicinesFor(p.id, p.pkg.startDate)); }}>
                 {t("nurse.rx.fillSample")}
               </Button>
-              <Button ref={saveSpot.ref} className={saveSpot.className} variant="primary" icon={Save} onClick={save}>
+              <Button ref={saveSpotRef} className={saveSpotCls} variant="primary" icon={Save} onClick={save}>
                 {t("nurse.rx.save")}
               </Button>
             </div>
@@ -159,8 +159,8 @@ export function RxPanel({ p, nurseId }: { p: Patient; nurseId: string }) {
                   <Checkbox key={m.id} checked={Boolean(checked[m.id])} onChange={(v) => setChecked({ ...checked, [m.id]: v })} label={t("nurse.rx.matches", { medicine: `${m.name} ${m.dose}` })} hint={`${m.slots.map((s) => t(`slot.${s}`)).join(" · ")} · ${t(`food.${m.food}`)}`} />
                 ))}
                 <Button
-                  ref={verifySpot.ref}
-                  className={verifySpot.className}
+                  ref={verifySpotRef}
+                  className={verifySpotCls}
                   variant="primary"
                   size="lg"
                   icon={ShieldCheck}

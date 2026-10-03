@@ -22,8 +22,8 @@ export function FamilyPackage() {
   const { t, date, money, person } = useT();
   const { repos, f, p, now, familyId } = useFamily();
   const [choice, setChoice] = useState<Choice | null>(null);
-  const renewSpot = useSpot<HTMLButtonElement>("family.renew");
-  const monthlySpot = useSpot<HTMLButtonElement>("family.monthly");
+  const { ref: renewSpotRef, className: renewSpotCls } = useSpot<HTMLButtonElement>("family.renew");
+  const { ref: monthlySpotRef, className: monthlySpotCls } = useSpot<HTMLButtonElement>("family.monthly");
   if (!f || !p) return <Screen><EmptyState title={t("common.notAllowed")} /></Screen>;
   const today = localDate(now);
   const left = daysLeft(p, today);
@@ -84,9 +84,9 @@ export function FamilyPackage() {
               <p className="text-2xl font-bold tabular-nums">{money(price(p.pkg.kind, len))}</p>
               <p className="text-muted">{t("pkg.length", { days: len })}</p>
               <Button
-                ref={i === 1 ? renewSpot.ref : undefined}
+                ref={i === 1 ? renewSpotRef : undefined}
                 variant={due ? "primary" : "secondary"}
-                className={i === 1 ? renewSpot.className : undefined}
+                className={i === 1 ? renewSpotCls : undefined}
                 onClick={() => setChoice({ kind: p.pkg.kind, lengthDays: len, purpose: "renewal" })}
               >
                 {t("family.plan.choose")}
@@ -98,7 +98,7 @@ export function FamilyPackage() {
               <p className="font-bold">{t("family.plan.monthly")}</p>
               <p className="text-2xl font-bold tabular-nums">{t("pkg.perMonth", { price: money(price("monthly", MONTH_DAYS)) })}</p>
               <p className="text-muted">{t("pkg.desc.monthly")}</p>
-              <Button ref={monthlySpot.ref} className={monthlySpot.className} variant="soft" onClick={() => setChoice({ kind: "monthly", lengthDays: MONTH_DAYS, purpose: "monthly" })}>
+              <Button ref={monthlySpotRef} className={monthlySpotCls} variant="soft" onClick={() => setChoice({ kind: "monthly", lengthDays: MONTH_DAYS, purpose: "monthly" })}>
                 {t("family.plan.choose")}
               </Button>
             </Card>
@@ -146,7 +146,7 @@ function PaymentSheet({ p, familyId, choice, onClose }: { p: Patient; familyId: 
   const packages = useDemo((s) => s.data?.packages) ?? [];
   const [method, setMethod] = useState<"upi" | "card">("upi");
   const [stage, setStage] = useState<"form" | "processing" | "success" | "failed">("form");
-  const paySpot = useSpot<HTMLButtonElement>("family.pay");
+  const { ref: paySpotRef, className: paySpotCls } = useSpot<HTMLButtonElement>("family.pay");
   if (!choice) return null;
   const def = packages.find((x) => x.id === choice.kind);
   const amount = choice.kind === "monthly" ? def?.prices.month ?? 0 : def?.prices[choice.lengthDays as 7 | 14 | 30] ?? 0;
@@ -167,7 +167,7 @@ function PaymentSheet({ p, familyId, choice, onClose }: { p: Patient; familyId: 
         stage === "form" ? (
           <>
             <Button onClick={close}>{t("common.cancel")}</Button>
-            <Button ref={paySpot.ref} variant="primary" icon={CreditCard} onClick={submit} className={paySpot.className}>
+            <Button ref={paySpotRef} variant="primary" icon={CreditCard} onClick={submit} className={paySpotCls}>
               {t("family.plan.payButton", { amount: money(amount) })}
             </Button>
           </>

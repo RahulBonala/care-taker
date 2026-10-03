@@ -47,10 +47,10 @@ export function CaregiverVisit() {
   const [error, setError] = useState("");
   const [unwell, setUnwell] = useState<"closed" | "confirm" | "sent">("closed");
   const [checking, setChecking] = useState(false);
-  const checkInSpot = useSpot<HTMLButtonElement>("caregiver.checkIn");
-  const fillSpot = useSpot<HTMLButtonElement>("caregiver.fillCounts");
-  const checkOutSpot = useSpot<HTMLButtonElement>("caregiver.checkOut");
-  const unwellSpot = useSpot<HTMLButtonElement>("caregiver.unwell");
+  const { ref: checkInSpotRef, className: checkInSpotCls } = useSpot<HTMLButtonElement>("caregiver.checkIn");
+  const { ref: fillSpotRef, className: fillSpotCls } = useSpot<HTMLButtonElement>("caregiver.fillCounts");
+  const { ref: checkOutSpotRef, className: checkOutSpotCls } = useSpot<HTMLButtonElement>("caregiver.checkOut");
+  const { ref: unwellSpotRef, className: unwellSpotCls } = useSpot<HTMLButtonElement>("caregiver.unwell");
 
   useEffect(() => {
     if (!recording) return;
@@ -113,7 +113,7 @@ export function CaregiverVisit() {
 
   const unwellButton = (
     <>
-      <Button ref={unwellSpot.ref} variant="danger" size="lg" full icon={CircleAlert} onClick={() => setUnwell("confirm")} className={unwellSpot.className}>
+      <Button ref={unwellSpotRef} variant="danger" size="lg" full icon={CircleAlert} onClick={() => setUnwell("confirm")} className={unwellSpotCls}>
         {t("caregiver.visit.unwell")}
       </Button>
       <Sheet
@@ -173,8 +173,8 @@ export function CaregiverVisit() {
           {!isToday && <Banner tone="info">{t("caregiver.visit.notToday", { date: date(v.date) })}</Banner>}
           <p className="text-muted">{t("caregiver.visit.notStarted")}</p>
           <Button
-            ref={checkInSpot.ref}
-            className={checkInSpot.className}
+            ref={checkInSpotRef}
+            className={checkInSpotCls}
             variant="primary"
             size="xl"
             full
@@ -231,7 +231,7 @@ export function CaregiverVisit() {
             <Section
               title={t("caregiver.visit.pillCount")}
               action={
-                <Button ref={fillSpot.ref} className={fillSpot.className} size="sm" variant="soft" icon={Sparkles} onClick={() => setCounts(Object.fromEntries(expected.map((c) => [c.medicineId, String(c.expected)])))}>
+                <Button ref={fillSpotRef} className={fillSpotCls} size="sm" variant="soft" icon={Sparkles} onClick={() => setCounts(Object.fromEntries(expected.map((c) => [c.medicineId, String(c.expected)])))}>
                   {t("caregiver.visit.fillExpected")}
                 </Button>
               }
@@ -297,7 +297,7 @@ export function CaregiverVisit() {
           </Section>
 
           {error && <Banner tone="danger">{error}</Banner>}
-          <Button ref={checkOutSpot.ref} className={checkOutSpot.className} variant="ok" size="xl" full icon={LogOut} onClick={checkOut} disabled={recording}>
+          <Button ref={checkOutSpotRef} className={checkOutSpotCls} variant="ok" size="xl" full icon={LogOut} onClick={checkOut} disabled={recording}>
             {t("caregiver.visit.checkOut")}
           </Button>
           <p className="text-center text-sm text-muted">{t("caregiver.visit.checkOutHelp")}</p>

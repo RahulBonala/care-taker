@@ -61,17 +61,14 @@ export function CallTranscript({
   const callTr = useMemo(() => makeTranslator(callLang, data), [callLang, data]);
   const result = useCallLines(call);
   const lines = useMemo(() => result?.lines ?? [], [result]);
-  const [shown, setShown] = useState(animate ? 0 : lines.length);
+  const [revealed, setShown] = useState(animate ? 0 : lines.length);
+  const shown = animate ? revealed : lines.length;
   const spokenUpTo = useRef(animate ? 0 : lines.length);
   const listRef = useRef<HTMLOListElement>(null);
 
   // Reveal new lines one at a time.
   useEffect(() => {
-    if (!animate) {
-      setShown(lines.length);
-      return;
-    }
-    if (shown >= lines.length) return;
+    if (!animate || shown >= lines.length) return;
     const id = window.setTimeout(() => setShown((n) => Math.min(lines.length, n + 1)), shown === 0 ? 150 : 650);
     return () => window.clearTimeout(id);
   }, [animate, shown, lines.length]);

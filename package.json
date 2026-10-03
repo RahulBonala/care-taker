@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "description": "Care Taker: clickable front-end-only demo of a post-discharge medicine follow-up service. Sample data only.",
+  "engines": {
+    "node": ">=20.9"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",

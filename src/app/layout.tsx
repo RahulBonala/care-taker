@@ -7,8 +7,8 @@ import "./globals.css";
 
 const base = process.env.NEXT_PUBLIC_BASE_PATH || "";
 
+// No title here: the shell renders <title> itself so it follows the demo language and screen.
 export const metadata: Metadata = {
-  title: { default: APP_NAME, template: `%s · ${APP_NAME}` },
   description: `${APP_TAGLINE}. Clickable demo with sample data.`,
   applicationName: APP_NAME,
   appleWebApp: { capable: true, title: APP_NAME, statusBarStyle: "default" },

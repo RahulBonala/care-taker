@@ -21,7 +21,7 @@ export function NursePatients() {
   const now = useDemo((s) => s.now);
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<Filter>("all");
-  const lakshmiSpot = useSpot<HTMLButtonElement>("nurse.patient.p_lakshmi");
+  const { ref: lakshmiSpotRef, className: lakshmiSpotCls } = useSpot<HTMLButtonElement>("nurse.patient.p_lakshmi");
 
   const list = repos.patients.search(query).filter((p) => {
     const s = patientSignals(repos, p, now);
@@ -76,10 +76,10 @@ export function NursePatients() {
             <li key={p.id}>
               <Card className="p-0">
                 <button
-                  ref={p.id === "p_lakshmi" ? lakshmiSpot.ref : undefined}
+                  ref={p.id === "p_lakshmi" ? lakshmiSpotRef : undefined}
                   type="button"
                   onClick={() => open(p.id)}
-                  className={`flex w-full items-start gap-3 rounded-2xl p-4 text-left hover:bg-surface-2 ${p.id === "p_lakshmi" ? (lakshmiSpot.className ?? "") : ""}`}
+                  className={`flex w-full items-start gap-3 rounded-2xl p-4 text-left hover:bg-surface-2 ${p.id === "p_lakshmi" ? (lakshmiSpotCls ?? "") : ""}`}
                 >
                   <Avatar hue={p.hue} size={48} />
                   <div className="min-w-0 flex-1 space-y-1">

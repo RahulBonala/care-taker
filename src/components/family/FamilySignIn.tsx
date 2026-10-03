@@ -17,8 +17,8 @@ export function FamilySignIn() {
   const [step, setStep] = useState<"phone" | "code" | "checking">("phone");
   const [code, setCode] = useState("");
   const [error, setError] = useState("");
-  const sendSpot = useSpot<HTMLButtonElement>("family.signin.send");
-  const verifySpot = useSpot<HTMLButtonElement>("family.signin.verify");
+  const { ref: sendSpotRef, className: sendSpotCls } = useSpot<HTMLButtonElement>("family.signin.send");
+  const { ref: verifySpotRef, className: verifySpotCls } = useSpot<HTMLButtonElement>("family.signin.verify");
 
   const send = (e: FormEvent) => {
     e.preventDefault();
@@ -53,7 +53,7 @@ export function FamilySignIn() {
             <Field label={t("family.signIn.phone")} htmlFor="fam-phone" error={error}>
               <Input id="fam-phone" type="tel" inputMode="tel" autoComplete="tel" value={phone} onChange={(e) => setPhone(e.target.value)} aria-invalid={Boolean(error)} />
             </Field>
-            <Button ref={sendSpot.ref} type="submit" variant="primary" size="lg" full icon={MessageSquare} className={sendSpot.className}>
+            <Button ref={sendSpotRef} type="submit" variant="primary" size="lg" full icon={MessageSquare} className={sendSpotCls}>
               {t("family.signIn.sendCode")}
             </Button>
           </form>
@@ -75,7 +75,7 @@ export function FamilySignIn() {
                 className="text-center text-2xl tracking-[0.5em]"
               />
             </Field>
-            <Button ref={verifySpot.ref} type="submit" variant="primary" size="lg" full icon={KeyRound} disabled={step === "checking"} className={verifySpot.className}>
+            <Button ref={verifySpotRef} type="submit" variant="primary" size="lg" full icon={KeyRound} disabled={step === "checking"} className={verifySpotCls}>
               {step === "checking" ? t("family.signIn.checking") : t("family.signIn.verify")}
             </Button>
             <Button variant="ghost" full onClick={() => setStep("phone")} disabled={step === "checking"}>

@@ -46,6 +46,7 @@ export function Providers({ children }: { children: ReactNode }) {
   if (!ready) {
     return (
       <div className="flex h-dvh flex-col items-center justify-center gap-6 bg-bg" role="status" aria-label={APP_NAME}>
+        <title>{APP_NAME}</title>
         <BrandMark />
         <div className="w-56 space-y-2">
           <div className="skeleton h-3 w-full" />

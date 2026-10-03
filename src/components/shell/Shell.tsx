@@ -2,9 +2,11 @@
 
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
+import { findScreen } from "@/components/roles/registry";
 import type { Role } from "@/domain/types";
 import { ROLES } from "@/domain/types";
 import { useIsDesktop } from "@/hooks/useMedia";
+import { brandName } from "@/i18n";
 import { useT } from "@/i18n/useT";
 import { useDemo } from "@/store/store";
 import { ActivityFeed } from "./ActivityFeed";
@@ -21,14 +23,19 @@ export function parseRolePath(pathname: string): { role: Role | null; screen: st
 }
 
 export function Shell({ children }: { children: ReactNode }) {
-  const { t } = useT();
+  const { t, lang } = useT();
   const pathname = usePathname();
   const { role, screen } = parseRolePath(pathname);
   const desktop = useIsDesktop();
   const feedOpen = useDemo((s) => s.ui.feedOpen);
 
+  // The tab title follows the demo language and the screen on show.
+  const page = role ? `${t(findScreen(role, screen).label)} · ${t(`roles.${role}.name`)}` : pathname.startsWith("/how-it-works") ? t("flow.title") : "";
+  const title = page ? `${page} · ${brandName(lang)}` : brandName(lang);
+
   return (
     <div className="flex h-dvh flex-col overflow-hidden">
+      <title>{title}</title>
       <a href="#content" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded-lg focus:bg-surface focus:px-3 focus:py-2">
         {t("shell.skipToContent")}
       </a>

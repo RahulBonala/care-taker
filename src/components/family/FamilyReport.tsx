@@ -1,7 +1,6 @@
 "use client";
 
 import { CircleCheck, Clock, ShieldAlert } from "lucide-react";
-import { useMemo } from "react";
 import { ReportLines } from "@/components/shared/ReportView";
 import { Banner, Chip, EmptyState, Screen, ScreenTitle, Section } from "@/components/ui";
 import { buildReportLines } from "@/domain/reports";
@@ -22,7 +21,7 @@ export function FamilyReport() {
   const selected = reports.find((r) => r.id === selectedId);
   const day = selected?.date ?? today;
   const report = selected ?? reports.filter((r) => r.date === today).at(-1);
-  const live = useMemo(() => (p && !report && day === today ? buildReportLines(data, p, today, now) : null), [data, p, report, day, today, now]);
+  const live = p && !report && day === today ? buildReportLines(data, p, today, now) : null;
 
   if (!f || !p) return <Screen><EmptyState title={t("common.notAllowed")} /></Screen>;
 
