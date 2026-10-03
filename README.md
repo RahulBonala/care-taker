@@ -24,7 +24,6 @@ The product name lives in one place: `src/config/brand.ts`.
 Needs Node.js 20.9 or newer.
 
 ```bash
-cd care-taker
 npm install
 npm run dev            # http://localhost:3000
 ```
@@ -42,18 +41,18 @@ Other commands:
 
 ## Put it online (free static hosting)
 
-`npm run build` writes a static site to `care-taker/out/`. Any static host works.
+`npm run build` writes a static site to `out/`. Any static host works.
 The app is at the root of the site unless you set `NEXT_PUBLIC_BASE_PATH`.
 
-**Netlify** — New site from Git → base directory `care-taker`, build command
-`npm run build`, publish directory `care-taker/out`. Or drag the `out` folder
+**Netlify** — New site from Git → build command `npm run build`, publish
+directory `out`. Or drag the `out` folder
 onto <https://app.netlify.com/drop>.
 
-**Vercel** — Import the repository, set *Root Directory* to `care-taker`. It
-detects Next.js; the static export needs no other settings.
+**Vercel** — Import the repository. It detects Next.js; the static export
+needs no other settings.
 
-**Cloudflare Pages** — Connect the repository → root directory `care-taker`,
-build command `npm run build`, output directory `out`.
+**Cloudflare Pages** — Connect the repository → build command `npm run build`,
+output directory `out`.
 
 **GitHub Pages** — Pages serves a site under `/<repository-name>/`, so build with
 that base path, then publish the `out` folder (for example with the
@@ -66,16 +65,6 @@ NEXT_PUBLIC_BASE_PATH=/<repository-name> npm run build
 `out/.nojekyll` is included so the `_next` folder is served. GitHub Pages on a
 private repository needs a paid GitHub plan; the other three hosts work with
 private repositories on their free plans.
-
-### Moving it to its own repository
-
-The demo sits in the `care-taker/` folder of this repository. To give it a
-repository of its own with its history:
-
-```bash
-git subtree split --prefix=care-taker -b care-taker-only
-git push git@github.com:<owner>/care-taker.git care-taker-only:main
-```
 
 ## 5-minute demo script
 
