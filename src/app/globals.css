@@ -1,0 +1,219 @@
+@import "tailwindcss";
+
+/* Container sizes for role screens: phone below 640 px, tablet 640-1024 px, desktop above. */
+@theme {
+  --container-tab: 40rem;
+  --container-desk: 64rem;
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", "Noto Sans Devanagari", "Noto Sans Telugu", "Nirmala UI", "Kohinoor Devanagari", "Kohinoor Telugu", "Mangal", "Gautami", sans-serif;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-brand: var(--brand);
+  --color-brand-ink: var(--brand-ink);
+  --color-brand-soft: var(--brand-soft);
+  --color-ok: var(--ok);
+  --color-ok-soft: var(--ok-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+  --color-stage: var(--stage);
+  --color-frame: var(--frame);
+}
+
+:root {
+  color-scheme: light dark;
+  --bg: #f5f7f8;
+  --surface: #ffffff;
+  --surface-2: #edf1f3;
+  --ink: #14191d;
+  --muted: #4c5861;
+  --line: #d3dade;
+  --brand: #0d6b63;
+  --brand-ink: #ffffff;
+  --brand-soft: #def2ee;
+  --ok: #156238;
+  --ok-soft: #e1f3e8;
+  --warn: #855000;
+  --warn-soft: #fcefd8;
+  --danger: #b02117;
+  --danger-soft: #fce6e4;
+  --info: #1d5ba3;
+  --info-soft: #e3edf9;
+  --stage: #dfe5e8;
+  --frame: #1c2226;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0e1215;
+    --surface: #161b1f;
+    --surface-2: #1e252a;
+    --ink: #edf1f3;
+    --muted: #a7b2ba;
+    --line: #313a41;
+    --brand: #52d0c0;
+    --brand-ink: #052925;
+    --brand-soft: #113633;
+    --ok: #74d69d;
+    --ok-soft: #122d1e;
+    --warn: #f0b75c;
+    --warn-soft: #352710;
+    --danger: #ff8b80;
+    --danger-soft: #3a1614;
+    --info: #8fbcf3;
+    --info-soft: #14263c;
+    --stage: #070a0c;
+    --frame: #2b3238;
+  }
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+  overflow: hidden;
+}
+
+/* Role panes size their layout to their own width, not the window. */
+.pane {
+  container-type: inline-size;
+}
+
+button,
+[role="button"],
+a,
+input,
+select,
+textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+
+:focus-visible {
+  outline: 3px solid var(--info);
+  outline-offset: 2px;
+}
+
+/* Story mode: the control to press next. */
+.spot-on {
+  position: relative;
+  outline: 3px solid var(--warn) !important;
+  outline-offset: 3px;
+  border-radius: 12px;
+  animation: spot-pulse 1.4s ease-in-out infinite;
+  z-index: 5;
+}
+
+@keyframes spot-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--warn) 45%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 10px color-mix(in srgb, var(--warn) 0%, transparent);
+  }
+}
+
+@keyframes ring-shake {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  20% {
+    transform: rotate(-12deg);
+  }
+  40% {
+    transform: rotate(10deg);
+  }
+  60% {
+    transform: rotate(-6deg);
+  }
+  80% {
+    transform: rotate(4deg);
+  }
+}
+
+.ring-shake {
+  animation: ring-shake 0.9s ease-in-out infinite;
+}
+
+@keyframes line-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.line-in {
+  animation: line-in 0.25s ease-out both;
+}
+
+@keyframes shimmer {
+  from {
+    background-position: -200px 0;
+  }
+  to {
+    background-position: 200px 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, var(--surface-2) 0, color-mix(in srgb, var(--surface-2) 50%, var(--surface)) 100px, var(--surface-2) 200px);
+  background-size: 400px 100%;
+  animation: shimmer 1.2s linear infinite;
+  border-radius: 8px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spot-on,
+  .ring-shake,
+  .line-in,
+  .skeleton {
+    animation: none;
+  }
+}
+
+/* Print: only the printable document, nothing of the demo shell. */
+@media print {
+  body {
+    overflow: visible;
+    background: #fff;
+    color: #000;
+  }
+  body * {
+    visibility: hidden;
+  }
+  .print-area,
+  .print-area * {
+    visibility: visible;
+  }
+  .print-area {
+    position: absolute;
+    inset: 0;
+    padding: 12mm;
+    background: #fff;
+    color: #000;
+  }
+  .no-print {
+    display: none !important;
+  }
+}
