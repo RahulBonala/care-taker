@@ -9,13 +9,14 @@ import { findPatient, nextId } from "@/domain/data";
 import { endDateFor, MONTH_DAYS, priceOf } from "@/domain/packages";
 import { currentPrescription } from "@/domain/schedule";
 import { defaultPattern, planVisits } from "@/domain/visits";
-import type { CarePlan, FamilyMember, Lang, LocalText, Medicine, PackageKind, PackageLength, Patient, Slot } from "@/domain/types";
+import type { CarePlan, FamilyMember, Honorific, Kin, Lang, LocalText, Medicine, PackageKind, PackageLength, Patient, PhoneType, Relation, Slot } from "@/domain/types";
 import type { HHMM } from "@/lib/time";
 import { addDays, localDate } from "@/lib/time";
 import { cancelCalls, ensureDayCalls } from "@/sim/day";
 import { audit, emit, messageFamily, openFlag } from "@/sim/emit";
 import { checkIn, completeVisit, missVisit, type VisitRecordInput } from "@/sim/visits";
 import { closeFlag, startFlagCall, type CloseFlagInput } from "@/sim/nurse";
+import { patientFromSample } from "@/sim/seed";
 import { mutate } from "./actions";
 import { setUi, useDemo } from "./store";
 
@@ -328,5 +329,200 @@ export function caregiverReportUnwell(patientId: string, caregiverId: string, vi
     openFlag(data, now, patientId, "caregiverUnwell", { visitId });
     emit(data, now, "event.caregiverUnwell", { patient: who(patientId) }, ["caregiver", "nurse", "family", "admin"], "danger", patientId);
     audit(data, now, caregiverId, "caregiver", "created", patientId, "audit.noteAdded", { patient: who(patientId) }, patientId);
+  });
+}
+
+/* ------------------------------------------------------------------ doctor */
+
+export function setReviewDate(patientId: string, doctorId: string, date: string) {
+  mutate((data, now) => {
+    const p = findPatient(data, patientId);
+    if (!p) return;
+    p.nextReviewDate = date;
+    emit(data, now, "event.reviewSet", { patient: who(p.id), date: { $date: date } }, ["family", "nurse", "doctor", "admin"], "info", p.id);
+    audit(data, now, doctorId, "doctor", "changed", p.id, "audit.reviewSet", { patient: who(p.id) }, p.id);
+  });
+}
+
+export function requestLongerPackage(patientId: string, doctorId: string, lengthDays: PackageLength) {
+  mutate((data, now) => {
+    const p = findPatient(data, patientId);
+    if (!p) return;
+    p.packageRequest = { lengthDays, by: doctorId, at: now };
+    messageFamily(data, now, p.id, "doctorRequest", { patient: who(p.id), person: who(doctorId), days: lengthDays });
+    emit(data, now, "event.packageRequested", { person: who(doctorId), days: lengthDays, patient: who(p.id) }, ["family", "nurse", "doctor", "admin"], "info", p.id);
+    audit(data, now, doctorId, "doctor", "created", p.id, "audit.packageRequested", { patient: who(p.id) }, p.id);
+  });
+}
+
+/* ------------------------------------------------------------------ desk */
+
+export interface EnrolForm {
+  sample?: string;
+  name: string;
+  honorific: Honorific;
+  gender: "f" | "m";
+  age: number;
+  phone: string;
+  language: Lang;
+  phoneType: PhoneType;
+  meals: Record<Slot, HHMM>;
+  address: string;
+  condition: string;
+  doctorId: string;
+  familyName: string;
+  familyPhone: string;
+  relation: Relation;
+  kind: PackageKind;
+  lengthDays: number;
+  payAtDesk: boolean;
+  consent: { calls: boolean; shareFamily: boolean; shareDoctor: boolean };
+  fileName?: string;
+}
+
+export function kinFor(relation: Relation, gender: "f" | "m"): Kin {
+  const f = gender === "f";
+  switch (relation) {
+    case "son":
+    case "daughter":
+      return f ? "mother" : "father";
+    case "sonInLaw":
+    case "daughterInLaw":
+      return f ? "motherInLaw" : "fatherInLaw";
+    case "husband":
+      return "wife";
+    case "wife":
+      return "husband";
+    case "brother":
+    case "sister":
+      return f ? "sister" : "brother";
+    case "grandson":
+    case "granddaughter":
+      return f ? "grandmother" : "grandfather";
+    default:
+      return f ? "aunt" : "uncle";
+  }
+}
+
+export function zoneForPhone(phone: string): string {
+  const p = phone.replace(/\s/g, "");
+  if (p.startsWith("+1")) return "America/New_York";
+  if (p.startsWith("+44")) return "Europe/London";
+  if (p.startsWith("+971")) return "Asia/Dubai";
+  if (p.startsWith("+65")) return "Asia/Singapore";
+  if (p.startsWith("+61")) return "Australia/Sydney";
+  return "Asia/Kolkata";
+}
+
+/** Enrol at discharge. Returns the new patient's id. */
+export function enrolPatient(form: EnrolForm, deskId: string): string {
+  let newId = "";
+  mutate((data, now) => {
+    const today = localDate(now);
+    const fromSample = form.sample && !data.patients.some((p) => p.id === form.sample) ? patientFromSample(form.sample, today) : undefined;
+    const id = fromSample?.patient.id ?? nextId(data, "p_");
+    newId = id;
+    const caregiver = data.staff.find((s) => s.role === "caregiver" && s.caregiver?.verified);
+    const base: Patient = fromSample?.patient ?? {
+      id,
+      name: { en: form.name.trim() },
+      honorific: form.honorific,
+      gender: form.gender,
+      age: form.age,
+      phone: form.phone.trim(),
+      language: form.language,
+      phoneType: form.phoneType,
+      condition: { en: form.condition.trim() },
+      hospitalId: data.hospitals[0].id,
+      doctorId: form.doctorId,
+      nurseId: "n_mary",
+      address: { en: form.address.trim() },
+      distanceKm: 4.5,
+      mealTimes: form.meals,
+      callTimes: {},
+      enrolledAt: now,
+      enrolledBy: deskId,
+      consent: { ...form.consent, recordedAt: now, recordedBy: deskId },
+      prescriptions: [],
+      pkg: { kind: form.kind, lengthDays: form.lengthDays, startDate: today, endDate: endDateFor(today, form.lengthDays), status: "active", paid: false },
+      carePlan: { pattern: defaultPattern(form.kind), tasks: ["vitals", "pillCount", "mobility"], visitStart: "11:00", caregiverId: caregiver?.id },
+      hue: 25 + (data.patients.length * 53) % 300,
+      baseline: { bpSys: 130, bpDia: 82, pulse: 78, tempC: 36.8, spo2: 97 },
+    };
+    const p: Patient = {
+      ...base,
+      enrolledAt: now,
+      enrolledBy: deskId,
+      mealTimes: form.meals,
+      doctorId: form.doctorId,
+      consent: { ...form.consent, recordedAt: now, recordedBy: deskId },
+      pkg: { kind: form.kind, lengthDays: form.kind === "monthly" ? MONTH_DAYS : form.lengthDays, startDate: today, endDate: endDateFor(today, form.kind === "monthly" ? MONTH_DAYS : form.lengthDays), status: "active", paid: form.payAtDesk, monthNo: form.kind === "monthly" ? 1 : undefined },
+      carePlan: { ...base.carePlan, pattern: defaultPattern(form.kind) },
+      dischargeSummary: form.fileName ? { fileName: form.fileName, uploadedAt: now } : undefined,
+    };
+    data.patients.push(p);
+    const family = fromSample?.family ?? [];
+    if (!family.length && form.familyName.trim()) {
+      family.push({ id: nextId(data, "f_"), patientId: id, name: { en: form.familyName.trim() }, relation: form.relation, kin: kinFor(form.relation, form.gender), phone: form.familyPhone.trim(), city: { en: "" }, timeZone: zoneForPhone(form.familyPhone), reportLanguage: form.language, primary: true });
+    }
+    data.family.push(...family);
+    const amount = priceOf(data.packages, p.pkg.kind, p.pkg.lengthDays);
+    if (form.payAtDesk) data.payments.push({ id: nextId(data, "pay"), patientId: id, familyId: family[0]?.id, kind: p.pkg.kind, lengthDays: p.pkg.lengthDays, amount, at: now, status: "success", method: "desk", purpose: p.pkg.kind === "monthly" ? "monthly" : "new" });
+    messageFamily(data, now, id, "welcome", { patient: who(id) });
+    emit(data, now, "event.enrolled", { patient: who(id) }, ["desk", "nurse", "family", "admin"], "info", id);
+    audit(data, now, deskId, "desk", "created", id, "audit.enrolled", { patient: who(id) }, id);
+    audit(data, now, deskId, "desk", "created", id, "audit.consentRecorded", { patient: who(id) }, id);
+    if (form.fileName) audit(data, now, deskId, "desk", "created", id, "audit.uploaded", { patient: who(id) }, id);
+  });
+  return newId;
+}
+
+export function setUploadFails(v: boolean) {
+  mutate((data) => {
+    data.settings.uploadFails = v;
+  });
+}
+
+export function printedHandout(patientId: string, deskId: string) {
+  mutate((data, now) => audit(data, now, deskId, "desk", "created", patientId, "audit.printedHandout", { patient: who(patientId) }, patientId));
+}
+
+/* ------------------------------------------------------------------ admin */
+
+export function savePrices(adminId: string, prices: Record<PackageKind, Partial<Record<PackageLength | "month", number>>>) {
+  mutate((data, now) => {
+    for (const def of data.packages) {
+      const next = prices[def.id];
+      if (!next) continue;
+      for (const [len, value] of Object.entries(next)) {
+        const k = len === "month" ? "month" : (Number(len) as PackageLength);
+        if (value == null || !Number.isFinite(value) || value <= 0) continue;
+        if (def.prices[k] !== value) {
+          def.prices[k] = Math.round(value);
+          emit(data, now, "event.priceChanged", { package: { $t: `pkg.name.${def.id}` }, length: len === "month" ? { $t: "pkg.perMonth", params: { price: { $money: value } } } : { $t: "pkg.length", params: { days: Number(len) } } }, ["admin", "family"], "info");
+          audit(data, now, adminId, "admin", "changed", def.id, "audit.priceChanged", { package: { $t: `pkg.name.${def.id}` } });
+        }
+      }
+    }
+  });
+}
+
+export function refundPayment(paymentId: string, adminId: string) {
+  mutate((data, now) => {
+    const pay = data.payments.find((x) => x.id === paymentId);
+    if (!pay || pay.status !== "success") return;
+    pay.status = "refunded";
+    emit(data, now, "event.refunded", { amount: { $money: pay.amount }, patient: who(pay.patientId) }, ["family", "admin"], "info", pay.patientId);
+    audit(data, now, adminId, "admin", "refunded", pay.id, "audit.refunded", { amount: { $money: pay.amount }, patient: who(pay.patientId) }, pay.patientId);
+  });
+}
+
+export function closeAdminFlag(flagId: string, adminId: string, outcome: LocalText) {
+  nurseCloseFlag(flagId, adminId, { outcome, spoke: false, role: "admin" });
+}
+
+export function setSimSetting<K extends keyof DemoData["settings"]>(key: K, value: DemoData["settings"][K]) {
+  mutate((data) => {
+    data.settings[key] = value;
   });
 }

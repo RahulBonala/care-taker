@@ -1,3 +1,4 @@
+import { accuracy, overview } from "@/domain/analytics";
 import type { DemoData } from "@/domain/data";
 import { DoseBook, replacedIds } from "@/domain/doses";
 import { priceOf } from "@/domain/packages";
@@ -114,6 +115,10 @@ export function createRepos(data: DemoData, viewer: Viewer): Repos {
     },
     events: {
       list: () => data.events,
+    },
+    analytics: {
+      overview: (now) => (viewer.role === "admin" ? overview(data, now) : null),
+      accuracy: () => (viewer.role === "admin" ? accuracy(data) : null),
     },
     doses: new DoseBook(data),
   };

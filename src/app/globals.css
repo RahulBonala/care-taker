@@ -50,6 +50,9 @@
   --info-soft: #e3edf9;
   --stage: #dfe5e8;
   --frame: #1c2226;
+  --series-1: #2a78d6;
+  --series-2: #eb6834;
+  --grid: #e3e8eb;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -73,6 +76,9 @@
     --info-soft: #14263c;
     --stage: #070a0c;
     --frame: #2b3238;
+    --series-1: #3987e5;
+    --series-2: #d95926;
+    --grid: #262e34;
   }
 }
 
@@ -192,28 +198,26 @@ textarea {
   }
 }
 
-/* Print: only the printable document, nothing of the demo shell. */
+/* Printable documents render into .print-root (a direct child of body). */
+.print-root {
+  display: none;
+}
+
 @media print {
+  html,
   body {
+    height: auto;
     overflow: visible;
     background: #fff;
     color: #000;
   }
-  body * {
-    visibility: hidden;
-  }
-  .print-area,
-  .print-area * {
-    visibility: visible;
-  }
-  .print-area {
-    position: absolute;
-    inset: 0;
-    padding: 12mm;
-    background: #fff;
-    color: #000;
-  }
-  .no-print {
+  body > *:not(.print-root) {
     display: none !important;
+  }
+  .print-root {
+    display: block;
+    padding: 0;
+    font-size: 12pt;
+    color: #000;
   }
 }

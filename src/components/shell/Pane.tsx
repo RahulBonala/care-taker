@@ -231,10 +231,12 @@ function PaneGate({ children }: { children: ReactNode }) {
     return () => window.clearTimeout(id);
   }, [key, slow]);
 
+  // Admin → Demo holds the switches themselves, so it is never blocked by them.
+  const demoControls = role === "admin" && screen === "demo";
   if (role === "family" && !signedIn) return <FamilySignIn />;
-  if (slow && loadedKey !== key) return <ScreenSkeleton />;
-  if (forceErrors && retriedKey !== key) return <ErrorState forced onRetry={() => setRetriedKey(key)} />;
-  if (offline && role !== "patient") {
+  if (slow && loadedKey !== key && !demoControls) return <ScreenSkeleton />;
+  if (forceErrors && retriedKey !== key && !demoControls) return <ErrorState forced onRetry={() => setRetriedKey(key)} />;
+  if (offline && role !== "patient" && !demoControls) {
     return (
       <>
         <OfflineNotice />

@@ -6,6 +6,7 @@
  * Every repo is created for one viewer (role + person) and only returns what
  * that viewer is allowed to see.
  */
+import type { accuracy, overview } from "@/domain/analytics";
 import type { DoseBook } from "@/domain/doses";
 import type {
   AuditEntry,
@@ -107,6 +108,12 @@ export interface EventsRepo {
   list(): ActivityEvent[];
 }
 
+/** Aggregate numbers for the admin overview and call accuracy (admin only). */
+export interface AnalyticsRepo {
+  overview(now: number): ReturnType<typeof overview> | null;
+  accuracy(): ReturnType<typeof accuracy> | null;
+}
+
 export interface Repos {
   viewer: Viewer;
   /** What this viewer may see at all. Screens show "not available" when false. */
@@ -124,5 +131,6 @@ export interface Repos {
   packages: PackagesRepo;
   audit: AuditRepo;
   events: EventsRepo;
+  analytics: AnalyticsRepo;
   doses: DoseBook;
 }

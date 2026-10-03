@@ -514,3 +514,14 @@ export function sampleMedicinesFor(patientId: string, start: LocalDate): Medicin
     endDate: addDays(start, (m.days ?? 14) - 1),
   }));
 }
+
+/** A sample patient as the desk would enrol them today: no prescription yet, no calls yet. */
+export function patientFromSample(id: string, start: LocalDate): { patient: Patient; family: FamilyMember[] } | undefined {
+  const s = PATIENTS.find((x) => x.id === id);
+  if (!s) return undefined;
+  const p = buildPatient(s, start);
+  return {
+    patient: { ...p, prescriptions: [], callsFrom: undefined, nextReviewDate: undefined, dischargeSummary: undefined, pkg: { ...p.pkg, paid: false } },
+    family: FAMILY.filter((f) => f.patientId === id).map((f) => structuredClone(f)),
+  };
+}
